@@ -1,0 +1,157 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.doctorPage{
+    display: block;
+    justify-content: center;
+    align-items: center;
+}
+
+.doctorPageImage {
+    width: 100%;
+    height: 87vh;
+    object-fit: cover;
+}
+
+.doctorPageText {
+    position: absolute;
+    top: 50%;
+    right: 5%; /* Adjust as needed */
+    left: auto;
+    transform: translateY(-50%);
+    color: white; /* Or black, depending on image contrast */
+    text-align: right;
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.doctorPageSubText{
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1.2;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    margin: 20px ;
+
+}
+
+.doctorPage-header-details{
+    justify-content: center;
+    align-items: center;
+    color: #2E66F3;
+}
+
+.newNavBar{
+    position: absolute;
+    transform: translate(40%, -1300%);
+}
+
+.doctorCard{
+    display: flex;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    height: auto;
+    justify-content: left; 
+    align-items: center;
+    width: 80%;
+    border: 1px solid #0a0a0a;
+    margin: 10px auto;
+}
+
+.doctorCardLeft{
+    display: block;
+    margin: 1px;
+    padding: 1px;
+    border-radius: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+    
+}
+
+.doctorCardRight{
+    display: block;
+    margin: 1px;
+    padding: 1px;
+    border-radius: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-left: 20px;
+    margin-top: 0px;
+}
+
+.doctorCardImage{
+    width: auto;
+    height: 250px;
+    object-fit: cover;
+}
+
+.doctorCardButton{
+    width: fit-content;
+    color: #2E1588;
+    font-size: 1.2rem;
+    font-weight: bold;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 25px;
+    margin: auto;
+    margin-left: 30px;
+}
+
+.doctorCardTitle{
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #0C4EF6;
+}
+
+
+.doctorCardSubtitle{
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2A63F3;
+}
+
+.doctorCardTime{
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #0C4EF6;
+    margin-top: 10px;
+}
+
+.doctorCardFeatures{
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #0C4EF6;
+    margin-top: 10px;
+}
+
+ul{
+    list-style-type: none;
+    padding: 0;
+}
+
+.list {
+    color: #333;
+}
+
+.doctorCardDescription{
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #0C4EF6;
+    margin-top: 10px;
+}
+
+.doctorCardDescriptionText{
+    font-size: 1rem;
+    font-weight: normal;
+    color: #333;
+    margin-top: 5px;
+}

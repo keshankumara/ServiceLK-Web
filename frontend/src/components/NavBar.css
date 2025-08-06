@@ -1,0 +1,30 @@
+.navBarContainer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #2A63F3;
+    color: white;
+}
+
+.navBarLogo{
+    display: flex;
+    align-items: center;
+}
+
+.navBarLinks{
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.navBarList{
+    list-style: none;
+    padding: 10px;
+    margin: 10px;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+li{
+    margin: 0 10px;
+}

@@ -1,0 +1,177 @@
+.homediv1{
+    position: relative;
+    width: 100%;
+    height: 560px; /* Adjust height as needed */
+    overflow: hidden;
+}
+.homediv1 img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 0;
+    /* Add a dark overlay directly on the image using filter */
+    filter: brightness(1.1);
+}
+
+.homeText {
+    position: absolute;
+    top: 50%;
+    right: 5%; /* Adjust as needed */
+    left: auto;
+    transform: translateY(-50%);
+    color: white; /* Or black, depending on image contrast */
+    text-align: right;
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.homeSearch {
+    position: absolute;
+    top: 50px; /* Place near the top */
+    right: 40px; /* Margin from right */
+    left: auto;
+    width: 300px; /* Adjust width as needed */
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+    border-radius: 25px; /* Fully rounded */
+    padding: 5px 15px;
+    box-sizing: border-box;
+}
+
+.homeSearch input {
+    border: none;
+    outline: none;
+    background: transparent;
+    flex: 1;
+    text-align: right; /* Text to right side */
+    font-size: 1rem;
+    padding: 8px 10px;
+    border-radius: 25px;
+}
+
+.homeSearch .search-icon {
+    margin-left: 10px;
+    margin-right: 0;
+    font-size: 1.2rem;
+    color: #555;
+    /* You can adjust icon color and size */
+    order: -1; /* Ensure icon appears at the left in flex */
+}
+
+.home-simple-para {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgb(255, 255, 255); /* Or black, depending on image contrast */
+    text-align: center;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 0;
+    margin-bottom: 0;
+    box-sizing: border-box;
+    width: calc(100% - 100px);
+}
+
+@media (max-width: 600px) {
+    .home-simple-para {
+        margin-left: 15px;
+        margin-right: 15px;
+        width: calc(100% - 30px);
+        font-size: 1rem;
+    }
+}
+
+.homeServiceContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;         /* Center cards horizontally */
+    gap: 20px;                       /* Equal margin between cards */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.services-card {
+    width: 220px;                    /* Increased card width */
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 32px 22px 26px 22px;    /* Slightly more padding */
+    box-shadow: 0 6px 18px rgba(46, 102, 243, 0.08), 0 1.5px 4px rgba(0,0,0,0.06);
+    text-align: center;
+    transition: transform 0.3s cubic-bezier(.4,2,.6,1), box-shadow 0.3s;
+    border: 1px solid #f0f4fa;
+}
+
+.services-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 12px 32px rgba(46, 102, 243, 0.13), 0 2px 8px rgba(0,0,0,0.10);
+}
+
+/* Service icon as image (not rounded, border-radius 15px, larger size, margin 20px all sides, centered) */
+.service-icon {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    background: none;
+    border-radius: 0;
+    font-size: 2.8rem;
+    color: #2E66F3;
+}
+
+.service-icon img {
+    width: 160px;
+    height: 160px;
+    margin: 0;
+    display: block;
+    border-radius: 15px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(46, 102, 243, 0.07);
+    background: linear-gradient(135deg, #eaf1fe 0%, #f3f8ff 100%);
+}
+
+.service-header {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.service-description {
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+
+.service-header {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.service-description {
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.service-main-header{
+    color: #2E66F3;
+    margin-top: 60px;
+    font-size: 60px;
+}
+
+.service-header{
+    color: #0A4CF2;
+}
+
+.service-description{
+    color: #2A63F3;
+}
