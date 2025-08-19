@@ -5,10 +5,7 @@ function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('users');
 
   // Sample Data
-  const [users, setUsers] = useState([
-    { id: 1, username: 'Alice', email: 'alice@mail.com' },
-    { id: 2, username: 'Bob', email: 'bob@mail.com' },
-  ]);
+  const [users, setUsers] = useState([]);
 
   const [providers, setProviders] = useState([
     { id: 1, name: 'Provider One', email: 'prov1@mail.com', specialization: 'Haircut' },
@@ -20,6 +17,7 @@ function AdminDashboard() {
     { id: 2, user: 'Bob', service: 'Massage', date: '2025-08-18', status: 'Pending' },
   ]);
 
+
   // Form Handling
   const [formData, setFormData] = useState({});
   const [editId, setEditId] = useState(null);
@@ -29,8 +27,32 @@ function AdminDashboard() {
   };
 
   const handleEdit = (item) => {
-    setFormData(item);
-    setEditId(item.id);
+    if (activeTab === 'users') {
+        setFormData({
+            username: item.username,
+            email: item.email,
+            password: item.password
+        });
+    } else if (activeTab === 'providers') {
+        setFormData({
+            name: item.name,
+            email: item.email,
+            specialization: item.specialization
+        });
+    } else if (activeTab === 'bookings') {
+        setFormData({
+            user: item.user,
+            service: item.service,
+            date: item.date,
+            status: item.status
+        });
+    }
+
+    // If editing a user, send update request to backend
+    if (activeTab === 'users') {
+        setFormData(item);
+        setEditId(item.id);
+    }
   };
 
   const handleDelete = (arraySetter, id) => {
@@ -101,60 +123,70 @@ React.useEffect(() => {
 
       {/* Tab Content */}
       <div className="tab-content">
-
-        {/* Users */}
         {activeTab === 'users' && (
-          <div>
-            <h2>Manage Users</h2>
-            <form
-              className="form"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                try {
-                  await fetch('http://localhost:8080/user/addUser', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      username: formData.username,
-                      email: formData.email,
-                      password: formData.password
-                    })
-                  });
-                  handleSubmit(setUsers, users);
-                } catch (err) {
-                  console.error('Failed to add user:', err);
-                  handleSubmit(setUsers, users);
-                }
-              }}
-            >
-              <input type="text" name="username" placeholder="Username" value={formData.username||''} onChange={handleChange} required />
-              <input type="email" name="email" placeholder="Email" value={formData.email||''} onChange={handleChange} required />
-              <input type="password" name="password" placeholder="Password" value={formData.password||''} onChange={handleChange} required />
-              <button type="submit">{editId ? 'Update' : 'Add'} User</button>
-            </form>
-            <table className="dashboard-table">
-              <thead>
-                <tr><th>ID</th><th>Username</th><th>Email</th><th>Password</th><th>Actions</th></tr>
-              </thead>
-              <tbody>
-                {users.map(u=>(
-                  <tr key={u.id}>
-                    <td>{u.id}</td>
-                    <td>{u.username}</td>
-                    <td>{u.email}</td>
-                    <td>{u.password}</td>
-                    <td>
-                      <button onClick={()=>handleEdit(u)}>Edit</button>
-                      <button onClick={()=>handleDelete(setUsers, u.id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+            <div>
+                <h2>Manage Users</h2>
+                <form
+                    className="form"
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        try {
+                            if (editId) {
+                                // Update user
+                                await fetch(`http://localhost:8080/user/update/${editId}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        username: formData.username,
+                                        email: formData.email,
+                                        password: formData.password
+                                    })
+                                });
+                            } else {
+                                // Add user
+                                await fetch('http://localhost:8080/user/addUser', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        username: formData.username,
+                                        email: formData.email,
+                                        password: formData.password
+                                    })
+                                });
+                            }
+                            handleSubmit(setUsers, users);
+                        } catch (err) {
+                            console.error('Failed to add/update user:', err);
+                            handleSubmit(setUsers, users);
+                        }
+                    }}
+                >
+                    <input type="text" name="username" placeholder="Username" value={formData.username||''} onChange={handleChange} required />
+                    <input type="email" name="email" placeholder="Email" value={formData.email||''} onChange={handleChange} required />
+                    <input type="password" name="password" placeholder="Password" value={formData.password||''} onChange={handleChange} required />
+                    <button type="submit">{editId ? 'Update' : 'Add'} User</button>
+                </form>
+                <table className="dashboard-table">
+                    <thead>
+                        <tr><th>ID</th><th>Username</th><th>Email</th><th>Password</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        {users.map(u=>(
+                            <tr key={u.id}>
+                                <td>{u.id}</td>
+                                <td>{u.username}</td>
+                                <td>{u.email}</td>
+                                <td>{u.password}</td>
+                                <td>
+                                    <button onClick={()=>handleEdit(u)}>Edit</button>
+                                    <button onClick={()=>handleDelete(setUsers, u.id)}>Delete</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         )}
-
-                            {/* Providers */}
         {activeTab === 'providers' && (
           <div>
             <h2>Manage Providers</h2>
