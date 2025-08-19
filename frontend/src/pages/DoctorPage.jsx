@@ -27,7 +27,7 @@ function DoctorPage() {
             <h1>Clinics</h1>
         </div>
         <div className="doctorPageSubText">
-            <h1 className="doctorPage-header-details">Doctors & Clinics</h1>
+            <h1 className="doctorPage-header-details" id='service-topic'>Doctors & Clinics</h1>
         </div>
 
         <div className='doctorCard'>

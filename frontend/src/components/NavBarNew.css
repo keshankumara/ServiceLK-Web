@@ -21,4 +21,9 @@
 
 li{
     margin: 0 10px;
+    
+}
+
+.navBarNewLink{
+    text-decoration: none;
 }

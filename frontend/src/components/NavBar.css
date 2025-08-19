@@ -28,3 +28,8 @@
 li{
     margin: 0 10px;
 }
+
+.navBarLink{
+    color: white;
+    text-decoration: none;
+}
