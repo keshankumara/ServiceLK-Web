@@ -3,20 +3,23 @@ import './Dashboard.css'
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('users');
+  
+
 
   // Sample Data
   const [users, setUsers] = useState([]);
 
-  const [providers, setProviders] = useState([
-    { id: 1, name: 'Provider One', email: 'prov1@mail.com', specialization: 'Haircut' },
-    { id: 2, name: 'Provider Two', email: 'prov2@mail.com', specialization: 'Massage' },
-  ]);
+  const [providers, setProviders] = useState([]);
 
   const [bookings, setBookings] = useState([
     { id: 1, user: 'Alice', service: 'Haircut', date: '2025-08-19', status: 'Confirmed' },
     { id: 2, user: 'Bob', service: 'Massage', date: '2025-08-18', status: 'Pending' },
   ]);
 
+  const [services, setServices] = useState([
+    { id: 1, name: 'Haircut', duration: '30 mins', price: 20 },
+    { id: 2, name: 'Massage', duration: '1 hour', price: 50 },
+  ]);
 
   // Form Handling
   const [formData, setFormData] = useState({});
@@ -37,6 +40,7 @@ function AdminDashboard() {
         setFormData({
             name: item.name,
             email: item.email,
+            password: item.password,
             specialization: item.specialization
         });
     } else if (activeTab === 'bookings') {
@@ -47,9 +51,20 @@ function AdminDashboard() {
             status: item.status
         });
     }
+    else if (activeTab === 'services') {
+        setFormData({
+            name: item.name,
+            duration: item.duration,
+            price: item.price
+        });
+    }
 
     // If editing a user, send update request to backend
     if (activeTab === 'users') {
+        setFormData(item);
+        setEditId(item.id);
+    }
+    else if (activeTab === 'providers') {
         setFormData(item);
         setEditId(item.id);
     }
@@ -65,8 +80,18 @@ function AdminDashboard() {
             })
             .catch(err => console.error('Delete user error:', err));
     }
+    else if (arraySetter === setProviders) {
+        fetch(`http://localhost:8080/provider/deleteProvider/${id}`, {
+            method: 'DELETE'
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to delete provider');
+            })
+            .catch(err => console.error('Delete provider error:', err));
+    }
     arraySetter(prev => prev.filter(i => i.id !== id));
   };
+
 
   const handleSubmit = (arraySetter, array) => {
     if (editId) {
@@ -90,9 +115,31 @@ React.useEffect(() => {
             .catch(err => console.error('Failed to fetch users:', err));
     }
 }, [activeTab]);
+
+// Fetch providers from backend
+React.useEffect(() => {
+    if (activeTab === 'providers') {
+        fetch('http://localhost:8080/provider/getAllProviders')
+            .then(res => res.json())
+            .then(data => setProviders(data))
+            .catch(err => console.error('Failed to fetch providers:', err));
+    }
+}, [activeTab]);
+
+// Fetch services from backend
+React.useEffect(() => {
+    if (activeTab === 'services') {
+        fetch('http://localhost:8080/service/getAllServices')
+            .then(res => res.json())
+            .then(data => setServices(data))
+            .catch(err => console.error('Failed to fetch services:', err));
+    }
+}, [activeTab]);
+
   const totalUsers = users.length;
   const totalProviders = providers.length;
   const totalBookings = bookings.length;
+  const totalServices = services.length;
 
   return (
     <div className="admin-container">
@@ -112,6 +159,10 @@ React.useEffect(() => {
           <h3>Total Bookings</h3>
           <p>{totalBookings}</p>
         </div>
+        <div className="card">
+            <h3>Total Services</h3>
+            <p>{totalServices}</p>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -119,6 +170,7 @@ React.useEffect(() => {
         <button className={activeTab==='users'?'active':''} onClick={()=>setActiveTab('users')}>Users</button>
         <button className={activeTab==='providers'?'active':''} onClick={()=>setActiveTab('providers')}>Providers</button>
         <button className={activeTab==='bookings'?'active':''} onClick={()=>setActiveTab('bookings')}>Bookings</button>
+        <button className={activeTab==='services'?'active':''} onClick={()=>setActiveTab('services')}>Services</button>
       </div>
 
       {/* Tab Content */}
@@ -190,15 +242,50 @@ React.useEffect(() => {
         {activeTab === 'providers' && (
           <div>
             <h2>Manage Providers</h2>
-            <form className="form" onSubmit={(e)=>{ e.preventDefault(); handleSubmit(setProviders, providers); }}>
+            <form className="form"
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        try {
+                            if (editId) {
+                                // Update provider
+                                await fetch(`http://localhost:8080/provider/update/${editId}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        name: formData.name,
+                                        email: formData.email,
+                                        password: formData.password,
+                                        specialization: formData.specialization
+                                    })
+                                });
+                            } else {
+                                // Add user
+                                await fetch('http://localhost:8080/provider/addProvider', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        name: formData.name,
+                                        email: formData.email,
+                                        password: formData.password,
+                                        specialization: formData.specialization
+                                    })
+                                });
+                            }
+                            handleSubmit(setProviders, providers);
+                        } catch (err) {
+                            console.error('Failed to add/update provider:', err);
+                            handleSubmit(setProviders, providers    );
+                        }
+                    }}>
               <input type="text" name="name" placeholder="Provider Name" value={formData.name||''} onChange={handleChange} required />
               <input type="email" name="email" placeholder="Email" value={formData.email||''} onChange={handleChange} required />
+              <input type="password" name="password" placeholder="Password" value={formData.password||''} onChange={handleChange} required />
               <input type="text" name="specialization" placeholder="Specialization" value={formData.specialization||''} onChange={handleChange} />
               <button type="submit">{editId ? 'Update' : 'Add'} Provider</button>
             </form>
             <table className="dashboard-table">
               <thead>
-                <tr><th>ID</th><th>Name</th><th>Email</th><th>Specialization</th><th>Actions</th></tr>
+                <tr><th>ID</th><th>Name</th><th>Email</th><th>Password</th><th>Specialization</th><th>Actions</th></tr>
               </thead>
               <tbody>
                 {providers.map(p=>(
@@ -206,6 +293,7 @@ React.useEffect(() => {
                     <td>{p.id}</td>
                     <td>{p.name}</td>
                     <td>{p.email}</td>
+                    <td>{p.password}</td>
                     <td>{p.specialization}</td>
                     <td>
                       <button onClick={()=>handleEdit(p)}>Edit</button>
@@ -249,6 +337,38 @@ React.useEffect(() => {
                     <td>
                       <button onClick={()=>handleEdit(b)}>Edit</button>
                       <button onClick={()=>handleDelete(setBookings, b.id)}>Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Services */}
+        {activeTab === 'services' && (
+          <div>
+            <h2>Manage Services</h2>
+            <form className="form" onSubmit={(e)=>{ e.preventDefault(); handleSubmit(setServices, services); }}>
+              <input type="text" name="name" placeholder="Service Name" value={formData.name||''} onChange={handleChange} required />
+              <input type="text" name="description" placeholder="Description" value={formData.description||''} onChange={handleChange} required />
+              <input type="number" name="price" placeholder="Price" value={formData.price||''} onChange={handleChange} required />
+              <button type="submit">{editId ? 'Update' : 'Add'} Service</button>
+            </form>
+            <table className="dashboard-table">
+              <thead>
+                <tr><th>ID</th><th>Name</th><th>Description</th><th>Price</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                {services.map(s=>(
+                  <tr key={s.id}>
+                    <td>{s.id}</td>
+                    <td>{s.name}</td>
+                    <td>{s.description}</td>
+                    <td>{s.price}</td>
+                    <td>
+                      <button onClick={()=>handleEdit(s)}>Edit</button>
+                      <button onClick={()=>handleDelete(setServices, s.id)}>Delete</button>
                     </td>
                   </tr>
                 ))}
