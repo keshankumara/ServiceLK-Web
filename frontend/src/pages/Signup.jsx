@@ -97,7 +97,7 @@ function Signup() {
                 Signup
               </button>
             </div>
-            <p className='test'>
+            <p className='test' style={{ color: "black" }}>
               Already have an account?{' '}
               <a
                 href="/login"

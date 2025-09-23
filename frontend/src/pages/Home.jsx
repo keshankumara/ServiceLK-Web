@@ -19,16 +19,15 @@ function Home() {
     window.scrollTo(0, 0);
   }, [navigate]);
 
-  // Check login status once
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
-  // Handle card click: if logged in -> go to DoctorPage, else -> go to login
+  
   const handleServiceClick = (serviceRoute) => {
     window.scrollTo(0, 0);
     if (isLoggedIn) {
-      navigate(serviceRoute); // redirect to the actual service page
+      navigate(serviceRoute); 
     } else {
-      navigate('/login'); // redirect to login if not logged in
+      navigate('/login'); 
     }
   };
 

@@ -10,6 +10,8 @@ import SalonPage from './pages/SalonPage.jsx'
 import VehiclePage from './pages/VehiclePage.jsx'
 import WellnessPage from './pages/WellnessPage.jsx'
 import ConsultationsPage from './pages/ConsultationsPage.jsx'
+import UserBookings from './pages/UserBookings.jsx'
+import AdminDashboard from './admin/Dashboard.jsx';
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
         <Route path="/VehiclePage" element={<VehiclePage />} />
         <Route path="/WellnessPage" element={<WellnessPage />} />
         <Route path="/ConsultationsPage" element={<ConsultationsPage />} />
+        <Route path="/UserBookings" element={<UserBookings />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
     </Router>
   );

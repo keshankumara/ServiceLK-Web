@@ -9,181 +9,329 @@ import Img4 from '../assets/images/WellnessPage/img4.png'
 import Img5 from '../assets/images/WellnessPage/img5.png'
 import Img6 from '../assets/images/WellnessPage/img6.png'
 import Img7 from '../assets/images/WellnessPage/img7.png'
-import NavBarNew from '../components/NavBarNew.jsx'
+import NavBarNew1 from '../components/NavBarNew.jsx'
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+//const doctorImages = [Img2, Img3, Img4, Img5, Img6, Img7];
+
+function useWellnessServices() {
+    const [wellnessCategoryId, setWellnessCategoryId] = useState(null);
+    const [wellnessServices, setWellnessServices] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const categoryName = "Therapy_Wellness"; 
+
+    useEffect(() => {
+        async function fetchWellnessCategoryAndServices() {
+            try {
+                setLoading(true);
+                
+                // Fetch the wellness category
+                const categoryRes = await fetch(`http://localhost:8080/category/getAllCategories`);
+                const categoryData = await categoryRes.json();
+                console.log('Fetched Category Data:', categoryData);
+                
+                // Find the category with matching name
+                const matchedCategory = categoryData.find(cat => cat.name === categoryName);
+                
+                if (matchedCategory) {
+                    const wellnessCatId = matchedCategory.id;
+                    console.log('Wellness Category ID:', wellnessCatId);
+                    setWellnessCategoryId(wellnessCatId);
+
+                    // Fetch all services
+                    const servicesRes = await fetch('http://localhost:8080/service/getAllServices');
+                    const servicesData = await servicesRes.json();
+                    console.log('All Services Data:', servicesData);
+                    console.log('Wellness Category ID type:', typeof wellnessCatId, 'value:', wellnessCatId);
+
+                    // Filter services by wellness category ID (ensure same type)
+                    const filteredServices = servicesData.filter(service => String(service.category_id) === String(wellnessCatId));
+                    console.log('Filtered Wellness Services:', filteredServices);
+                    setWellnessServices(filteredServices);
+                } else {
+                    console.log('Wellness category not found');
+                    setWellnessServices([]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch wellness category or services:', error);
+                setWellnessCategoryId(null);
+                setWellnessServices([]);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchWellnessCategoryAndServices();
+    }, []);
+
+    return { wellnessCategoryId, wellnessServices, loading };
+}
 
 function WellnessPage() {
-  return (
-    <div className='wellnessPage'>
-        <NavBar/>
-        <div>
-            <img src={Img1} alt="Wellness Page Banner" className='wellnessPageImage' />
-        </div>
-        <div className='newNavBar'>
-            <NavBarNew />
-        </div>
-        <div className="wellnessPageText ">
-            <h1>Feel Better Inside & Out...   Book</h1>
-            <h1>Trusted Wellness & Therapy</h1>
-            <h1>Services</h1>
-        </div>
-        <div className="wellnessPageSubText">
-            <h1 className="wellnessPage-header-details" id='service-topic'>Wellness & Therapy</h1>
-        </div>
+    const { wellnessServices, loading } = useWellnessServices();
+    const navigate = useNavigate();
+    
+    // State for popup management
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedService, setSelectedService] = useState(null);
+    const [bookingData, setBookingData] = useState({
+        bookingDate: '',
+        status: 'pending'
+    });
 
-        <div className='wellnessCard'>
-            <div className='wellnessCardLeft'>
-                <div>
-                    <img src={Img2} alt="Wellness Card" className='wellnessCardImage'/>
-                </div>
-                <div>
-                    <button className='wellnessCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='wellnessCardRight'>
-                <h1 className='wellnessCardTitle'>MindEase Therapy Center – Colombo</h1>
-                <h3 className='wellnessCardSubtitle'>Service: Individual Mental Health Counseling</h3>
-                <h4 className='wellnessCardTime'>Time: Mon–Fri | 9:00 AM – 5:00 PM</h4>
-                <h3 className='wellnessCardFeatures'>Features:</h3>
-                <ul className='wellnessCardFeatureList'>
-                    <li className='list'>Certified psychologists</li>
-                    <li className='list'>Anxiety & stress management</li>
-                    <li className='list'>Confidential one-on-one sessions</li>
-                    <li className='list'>Online appointments available</li>
-                </ul>
-                <h3 className='wellnessCardDescription'>Description:</h3>
-                <p className='wellnessCardDescriptionText'>Get personal support from licensed professionals in a safe, calm space to help manage anxiety, stress, and life challenges.</p>
-            </div>
-        </div>
+    // Get user data from localStorage
+    const getUserData = () => {
+        try {
+            const userData = localStorage.getItem('userData');
+            return userData ? JSON.parse(userData) : null;
+        } catch (error) {
+            console.error('Error parsing user data:', error);
+            return null;
+        }
+    };
 
-        <div className='wellnessCard'>
-            <div className='wellnessCardLeft'>
-                <div>
-                    <img src={Img3} alt="Wellness Card" className='wellnessCardImage'/>
-                </div>
-                <div>
-                    <button className='wellnessCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='wellnessCardRight'>
-                <h1 className='wellnessCardTitle'>BodyBalance Physiotherapy – Galle</h1>
-                <h3 className='wellnessCardSubtitle'>Service: Post-Injury Physiotherapy</h3>
-                <h4 className='wellnessCardTime'>Time: Mon–Sat | 8:30 AM – 4:30 PM</h4>
-                <h3 className='wellnessCardFeatures'>Features:</h3>
-                <ul className='wellnessCardFeatureList'>
-                    <li className='list'>Muscle rehabilitation</li>
-                    <li className='list'>Joint mobility therapy</li>
-                    <li className='list'>Personalized recovery plans</li>
-                    <li className='list'>Insurance-covered sessions</li>
-                </ul>
-                <h3 className='wellnessCardDescription'>Description:</h3>
-                <p className='wellnessCardDescriptionText'>Recover stronger with guided physical therapy sessions tailored to your needs and injury recovery progress.</p>
-            </div>
-        </div>
+    // Handle appointment button click
+    const handleAppointmentClick = (service) => {
+        const userData = getUserData();
+        
+        if (!userData) {
+            alert('Please log in to book an appointment.');
+            window.location.href = '/login';
+            return;
+        }
 
-        <div className='wellnessCard'>
-            <div className='wellnessCardLeft'>
-                <div>
-                    <img src={Img4} alt="Wellness Card" className='wellnessCardImage'/>
-                </div>
-                <div>
-                    <button className='wellnessCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='wellnessCardRight'>
-                <h1 className='wellnessCardTitle'>Serenity Wellness Hub – Kandy</h1>
-                <h3 className='wellnessCardSubtitle'>Service: Mindfulness & Meditation Classes</h3>
-                <h4 className='wellnessCardTime'>Time: Tue–Sun | 7:00 AM – 11:00 AM</h4>
-                <h3 className='wellnessCardFeatures'>Features:</h3>
-                <ul className='wellnessCardFeatureList'>
-                    <li className='list'>Guided meditation sessions</li>
-                    <li className='list'>Breathing techniques</li>
-                    <li className='list'>Group and individual classes</li>
-                    <li className='list'>Calm, nature-themed environment</li>
-                </ul>
-                <h3 className='wellnessCardDescription'>Description:</h3>
-                <p className='wellnessCardDescriptionText'>Reclaim peace of mind with meditation practices that improve focus, reduce anxiety, and promote emotional well-being.</p>
-            </div>
-        </div>
+        setSelectedService(service);
+        setBookingData({
+            bookingDate: '',
+            status: 'pending'
+        });
+        setShowPopup(true);
+    };
 
-        <div className='wellnessCard'>
-            <div className='wellnessCardLeft'>
-                <div>
-                    <img src={Img5} alt="Wellness Card" className='wellnessCardImage'/>
-                </div>
-                <div>
-                    <button className='wellnessCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='wellnessCardRight'>
-                <h1 className='wellnessCardTitle'>VitalFlow – Matara</h1>
-                <h3 className='wellnessCardSubtitle'>Service: Yoga & Stretch Therapy</h3>
-                <h4 className='wellnessCardTime'>Time: Daily | 6:30 AM – 9:30 AM</h4>
-                <h3 className='wellnessCardFeatures'>Features:</h3>
-                <ul className='wellnessCardFeatureList'>
-                    <li className='list'>Certified yoga instructors</li>
-                    <li className='list'>Gentle and power yoga</li>
-                    <li className='list'>Flexibility-focused routines</li>
-                    <li className='list'>Beginners & senior-friendly</li>
-                </ul>
-                <h3 className='wellnessCardDescription'>Description:</h3>
-                <p className='wellnessCardDescriptionText'>Build flexibility, improve posture, and find inner balance through professionally guided yoga and stretch therapy.</p>
-            </div>
-        </div>
+    // Handle form submission
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        
+        const userData = getUserData();
+        
+        if (!userData) {
+            alert('User session expired. Please log in again.');
+            window.location.href = '/login';
+            return;
+        }
 
-        <div className='wellnessCard'>
-            <div className='wellnessCardLeft'>
-                <div>
-                    <img src={Img6} alt="Wellness Card" className='wellnessCardImage'/>
-                </div>
-                <div>
-                    <button className='wellnessCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='wellnessCardRight'>
-                <h1 className='wellnessCardTitle'>HealNest – Kurunegala</h1>
-                <h3 className='wellnessCardSubtitle'>Service: Family & Couples Therapy</h3>
-                <h4 className='wellnessCardTime'>Time: Wed–Sun | 2:00 PM – 6:00 PM</h4>
-                <h3 className='wellnessCardFeatures'>Features:</h3>
-                <ul className='wellnessCardFeatureList'>
-                    <li className='list'>Licensed family therapists</li>
-                    <li className='list'>Relationship support</li>
-                    <li className='list'>Conflict resolution strategies</li>
-                    <li className='list'>LGBTQ+ inclusive</li>
-                </ul>
-                <h3 className='wellnessCardDescription'>Description:</h3>
-                <p className='wellnessCardDescriptionText'>Strengthen relationships and improve communication through supportive, confidential family and couples therapy sessions.</p>
-            </div>
-        </div>
+        const bookingPayload = {
+            user_id: parseInt(userData.userId),
+            service_id: selectedService.id,
+            booking_date: bookingData.bookingDate,
+            status: bookingData.status
+        };
 
-        <div className='wellnessCard'>
-            <div className='wellnessCardLeft'>
-                <div>
-                    <img src={Img7} alt="Wellness Card" className='wellnessCardImage'/>
-                </div>
-                <div>
-                    <button className='wellnessCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='wellnessCardRight'>
-                <h1 className='wellnessCardTitle'>Reviva Therapy Studio – Negombo</h1>
-                <h3 className='wellnessCardSubtitle'>Service: Trauma & PTSD Counseling</h3>
-                <h4 className='wellnessCardTime'>Time: Mon–Fri | 10:00 AM – 4:00 PM</h4>
-                <h3 className='wellnessCardFeatures'>Features:</h3>
-                <ul className='wellnessCardFeatureList'>
-                    <li className='list'>Trauma-informed professionals</li>
-                    <li className='list'>PTSD and emotional recovery</li>
-                    <li className='list'>Safe, private setting</li>
-                    <li className='list'>Long-term support options</li>
-                </ul>
-                <h3 className='wellnessCardDescription'>Description:</h3>
-                <p className='wellnessCardDescriptionText'>Expert-guided therapy sessions designed to help you process trauma and begin healing in a supportive environment.</p>
-            </div>
-        </div>
+        try {
+            console.log('Booking wellness appointment with data:', bookingPayload);
+            
+            // Submit booking to backend
+            const response = await fetch('http://localhost:8080/booking/addBooking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookingPayload)
+            });
 
-        <Footer/>
-    </div>
-  )
+            if (response.ok) {
+                const result = await response.text();
+                console.log('Booking response:', result);
+                
+                //alert(`Wellness appointment booked successfully!\nUser: ${userData.username}\nService: ${selectedService.name}\nDate: ${bookingData.bookingDate}\nBooking ID: ${result || 'Generated'}`);
+                
+                // Close popup and reset form
+                setShowPopup(false);
+                setSelectedService(null);
+                setBookingData({
+                    bookingDate: '',
+                    status: 'pending'
+                });
+                
+                // Navigate to UserBookings page
+                navigate('/UserBookings');
+            } else {
+                const errorText = await response.text();
+                console.error('Booking failed:', errorText);
+                alert('Failed to book appointment. Please try again.');
+            }
+            
+        } catch (error) {
+            console.error('Error booking appointment:', error);
+            alert('Failed to book appointment. Please check your connection and try again.');
+        }
+    };
+
+    return (
+        <div className='wellnessPage'>
+            <NavBar/>
+            <div>
+                <img src={Img1} alt="Wellness Page Banner" className='wellnessPageImage' />
+            </div>
+            <div className="wellnessPageText ">
+                <h1 className='wellness'>Feel Better Inside & Out...   Book</h1>
+                <h1 className='wellness'>Trusted Wellness & Therapy</h1>
+                <h1 className='wellness'>Services</h1>
+            </div>
+            <div className='wellnessServicesSection'>
+                <div className='sectionHeader'>
+                    <h2 className='sectionTitle'>Available Wellness Services</h2>
+                    <p className='sectionSubtitle'>Discover trusted therapy and wellness providers in your area</p>
+                </div>
+                
+                <div className='wellnessCardGrid'>
+                    {loading ? (
+                        <div className='loadingState'>
+                            <div className='loadingSpinner'></div>
+                            <p>Loading wellness services...</p>
+                        </div>
+                    ) : wellnessServices.length === 0 ? (
+                        <div className='emptyState'>
+                            <p>No wellness services found at the moment.</p>
+                        </div>
+                    ) : (
+                        wellnessServices.map((service, idx) => {
+                            // Cycle through images for each card
+                            const images = [Img2, Img3, Img4, Img5, Img6, Img7];
+                            const imageSrc = images[idx % images.length];
+                            
+                            // Define unique gradient combinations for each card (wellness themed)
+                            const gradientClasses = [
+                                'gradient-healing-green',
+                                'gradient-zen-purple', 
+                                'gradient-calm-blue',
+                                'gradient-nature-earth',
+                                'gradient-serenity-teal',
+                                'gradient-harmony-pink'
+                            ];
+                            const gradientClass = gradientClasses[idx % gradientClasses.length];
+                            
+                            return (
+                                <article key={service.id} className={`wellnessCard ${gradientClass}`}>
+                                    <div className='cardHeader'>
+                                        <div className='cardImageContainer'>
+                                            <img src={imageSrc} alt={`${service.name} wellness service`} className='cardImage'/>
+                                            <div className='imageOverlay'></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className='cardContent'>
+                                        <div className='cardInfo'>
+                                            <h3 className='cardTitle' style={{ color: "black" }}>{service.name}</h3>
+                                            <p className='cardDescription' style={{ color: "black" }}>{service.description}</p>
+                                            
+                                            <div className='cardDetails'>
+                                                <div className='detailItem'>
+                                                    <span className='detailIcon'>📍</span>
+                                                    <span className='detailText' style={{ color: "black" }}>{service.location}</span>
+                                                </div>
+                                                <div className='detailItem'>
+                                                    <span className='detailIcon'>💰</span>
+                                                    <span className='detailText' style={{ color: "black" }}>LKR {service.price}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className='cardActions'>
+                                            <button 
+                                                className='primaryButton'
+                                                onClick={() => handleAppointmentClick(service)}
+                                            >
+                                                <span className='buttonText' style={{ color: "black" }}>Appointment</span>
+                                                <span className='buttonIcon'>→</span>
+                                            </button>
+                                            <button className='secondaryButton' style={{ color: "black" }}>Learn More</button>
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+            
+            {/* Appointment Booking Popup */}
+            {showPopup && (
+                <div className='popupOverlay' onClick={() => setShowPopup(false)}>
+                    <div className='popupContent' onClick={(e) => e.stopPropagation()}>
+                        <div className='popupHeader'>
+                            <h3 className='popupTitle'>Book Wellness Appointment</h3>
+                            <button 
+                                className='closeButton'
+                                onClick={() => setShowPopup(false)}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        
+                        {selectedService && (
+                            <div className='popupBody'>
+                                <div className='serviceDetails'>
+                                    <h4>Service Details</h4>
+                                    <p><strong>Service:</strong> {selectedService.name}</p>
+                                    <p><strong>Description:</strong> {selectedService.description}</p>
+                                    <p><strong>Location:</strong> {selectedService.location}</p>
+                                    <p><strong>Price:</strong> LKR {selectedService.price}</p>
+                                </div>
+
+                                <div className='userDetails'>
+                                    <h4>User Information</h4>
+                                    <p><strong>User:</strong> {getUserData()?.username || 'Not logged in'}</p>
+                                    <p><strong>User ID:</strong> {getUserData()?.userId || 'Not logged in'}</p>
+                                </div>
+                                
+                                <form className='bookingForm' onSubmit={handleFormSubmit}>
+                                    <div className='formGroup'>
+                                        <label htmlFor='bookingDate'>Booking Date:</label>
+                                        <input
+                                            type='date'
+                                            id='bookingDate'
+                                            value={bookingData.bookingDate}
+                                            onChange={(e) => setBookingData({...bookingData, bookingDate: e.target.value})}
+                                            min={new Date().toISOString().split('T')[0]}
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div className='formGroup'>
+                                        <label htmlFor='status'>Status:</label>
+                                        <select
+                                            id='status'
+                                            value={bookingData.status}
+                                            onChange={(e) => setBookingData({...bookingData, status: e.target.value})}
+                                        >
+                                            <option value='confirmed'>Confirmed</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div className='popupActions'>
+                                        <button type='submit' className='submitButton'>
+                                            Book Appointment
+                                        </button>
+                                        <button 
+                                            type='button' 
+                                            className='cancelButton'
+                                            onClick={() => setShowPopup(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+            
+            <Footer/>
+        </div>
+    )
 }
 
 export default WellnessPage

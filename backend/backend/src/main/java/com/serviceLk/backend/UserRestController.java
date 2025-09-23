@@ -60,7 +60,12 @@ public class UserRestController {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (user.getPassword().equals(password)) {
-                return ResponseEntity.ok("Login successful");
+                //return ResponseEntity.ok("Login successful");
+                return ResponseEntity.ok(Map.of(
+                        "message", "Login successful",
+                        "userId", user.getID()
+                ));
+
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid password");
             }

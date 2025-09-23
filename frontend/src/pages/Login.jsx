@@ -8,8 +8,24 @@ function Login() {
     e.preventDefault();
     const username = document.querySelector('.loginInput[type="text"]').value;
     const password = document.querySelector('.loginInput[type="password"]').value;
+    if (username === "admin" && password === "123") {
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      // Store admin user data
+      const adminUserData = {
+        username: 'admin',
+        userId: 'admin', // Admin has a special ID
+        role: 'admin',
+        loginTime: new Date().toISOString()
+      };
+      localStorage.setItem('userData', JSON.stringify(adminUserData));
+      
+      window.location.href = '/admin/dashboard';
+      return;
+    }
 
-    try {
+    else{
+      try {
       const response = await fetch('http://localhost:8080/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -21,18 +37,33 @@ function Login() {
         throw new Error('Login failed');
       }
 
-      const data = await response.text(); // backend just returns text
-      if (data === 'Login successful') {
-        localStorage.setItem('isLoggedIn', 'true'); // <-- store login state
+      const data = await response.json(); 
+      if (data.message === "Login successful") {
+        localStorage.setItem("isLoggedIn", "true"); 
+        localStorage.setItem("userId", data.userId); 
+        console.log("Logged in user:", data.userId);
+        
+        
+        const userData = {
+          username: username,
+          userId: data.userId, 
+          loginTime: new Date().toISOString()
+        };
+        localStorage.setItem('userData', JSON.stringify(userData));
+        
         window.location.href = '/DoctorPage';
       } else {
-        alert('An error occurred. Please try again.');
+        alert("Login failed!");
       }
-
-    } catch (err) {
+      
+      } catch (err) {
       console.error(err);
       alert('An error occurred. Please try again.');
     }
+    }
+    
+
+    
   };
 
   return (
@@ -50,7 +81,7 @@ function Login() {
             <div className='loginButtonContainer'>
               <button type="submit" className="loginButton">Login</button>
             </div>
-            <p className='test'>Don’t have an account? <a href="/signup">Register</a></p>
+            <p className='test' style={{ color: "black" }}>Don’t have an account? <a href="/signup">Register</a></p>
           </form>
         </div>
 

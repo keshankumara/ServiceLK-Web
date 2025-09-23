@@ -1,157 +1,682 @@
-*{
+/* Reset and base styles */
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-.dentalPage{
+.dentalPage {
     display: block;
-    justify-content: center;
-    align-items: center;
+    background-color: #089dc2c9;
+    min-height: 100vh;
 }
 
 .dentalPageImage {
     width: 100%;
     height: 87vh;
     object-fit: cover;
+    position: relative;
 }
 
 .dentalPageText {
     position: absolute;
     top: 50%;
-    left: 5%; /* Adjust as needed */
+    left: 5%;
     right: auto;
     transform: translateY(-50%);
-    color: white; /* Or black, depending on image contrast */
+    color: white;
     text-align: left;
-    font-size: 2rem;
-    font-weight: bold;
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 700;
     line-height: 1.2;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 2;
 }
 
-.dentalPageSubText{
-    font-size: 1.5rem;
-    font-weight: bold;
-    line-height: 1.2;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    margin: 20px ;
 
+/* Services Section Styling */
+.dentalServicesSection {
+    padding: 4rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-.dentalPage-header-details{
-    justify-content: center;
-    align-items: center;
-    color: #2E66F3;
+.sectionHeader {
+    text-align: center;
+    margin-bottom: 4rem;
+    position: relative;
 }
 
-.newNavBar{
+.sectionHeader::after {
+    content: '';
     position: absolute;
-    transform: translate(40%, -1300%);
+    bottom: -1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #06b6d4, #0891b2);
+    border-radius: 2px;
 }
 
-.dentalCard{
+.sectionTitle {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.sectionSubtitle {
+    font-size: 1.2rem;
+    color: #6b7280;
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.dental{
+    color: white;
+}
+
+/* Card Grid Layout */
+.dentalCardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* Individual Card Styling with Enhanced Glassmorphism - Fixed Layout */
+.dentalCard {
+    position: relative;
+    border-radius: 24px;
+    padding: 1.5rem;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 2px 16px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
     display: flex;
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
+    flex-direction: column;
+    min-height: 500px;
     height: auto;
-    justify-content: left; 
-    align-items: center;
-    width: 80%;
-    border: 1px solid #0a0a0a;
-    margin: 10px auto;
 }
 
-.dentalCardLeft{
-    display: block;
-    margin: 1px;
-    padding: 1px;
-    border-radius: 10px;
-    justify-content: center;
-    align-items: center;
-    margin-right: 20px;
-    
+/* Enhanced shine effect */
+.dentalCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
 }
 
-.dentalCardRight{
-    display: block;
-    margin: 1px;
-    padding: 1px;
-    border-radius: 10px;
-    justify-content: center;
-    align-items: center;
-    margin-left: 20px;
-    margin-top: 0px;
+.dentalCard:hover::before {
+    left: 100%;
 }
 
-.dentalCardImage{
-    width: auto;
-    height: 250px;
+/* Floating animation */
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-5px) rotate(0.5deg); }
+    50% { transform: translateY(-10px) rotate(0deg); }
+    75% { transform: translateY(-5px) rotate(-0.5deg); }
+}
+
+.dentalCard {
+    animation: float 6s ease-in-out infinite;
+}
+
+.dentalCard:nth-child(even) {
+    animation-delay: -3s;
+}
+
+/* Unique Dental-Themed Gradient Backgrounds */
+.gradient-mint-fresh {
+    background: linear-gradient(135deg, 
+        rgba(6, 182, 212, 0.95) 0%, 
+        rgba(8, 145, 178, 0.95) 50%,
+        rgba(14, 116, 144, 0.95) 100%
+    );
+    box-shadow: 0 8px 32px rgba(6, 182, 212, 0.3);
+}
+
+.gradient-pearl-white {
+    background: linear-gradient(135deg, 
+        rgba(241, 245, 249, 0.95) 0%, 
+        rgba(203, 213, 225, 0.95) 50%,
+        rgba(148, 163, 184, 0.95) 100%
+    );
+    box-shadow: 0 8px 32px rgba(203, 213, 225, 0.3);
+}
+
+.gradient-aqua-clean {
+    background: linear-gradient(135deg, 
+        rgba(34, 197, 94, 0.95) 0%, 
+        rgba(16, 185, 129, 0.95) 50%,
+        rgba(5, 150, 105, 0.95) 100%
+    );
+    box-shadow: 0 8px 32px rgba(34, 197, 94, 0.3);
+}
+
+.gradient-sapphire-blue {
+    background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.95) 0%, 
+        rgba(37, 99, 235, 0.95) 50%,
+        rgba(29, 78, 216, 0.95) 100%
+    );
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+}
+
+.gradient-emerald-mint {
+    background: linear-gradient(135deg, 
+        rgba(16, 185, 129, 0.95) 0%, 
+        rgba(5, 150, 105, 0.95) 50%,
+        rgba(4, 120, 87, 0.95) 100%
+    );
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+}
+
+.gradient-crystal-clear {
+    background: linear-gradient(135deg, 
+        rgba(156, 163, 175, 0.95) 0%, 
+        rgba(107, 114, 128, 0.95) 50%,
+        rgba(75, 85, 99, 0.95) 100%
+    );
+    box-shadow: 0 8px 32px rgba(156, 163, 175, 0.3);
+}
+.gradient-crystal-clear {
+    background: linear-gradient(135deg, 
+        rgba(156, 163, 175, 0.95) 0%, 
+        rgba(107, 114, 128, 0.95) 50%,
+        rgba(75, 85, 99, 0.95) 100%
+    );
+    box-shadow: 0 8px 32px rgba(156, 163, 175, 0.3);
+}
+
+/* Card Hover Effects with Enhanced Animations */
+.dentalCard:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 
+        0 25px 80px rgba(0, 0, 0, 0.15),
+        0 12px 30px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Enhanced Card Image with Parallax Effect */
+.cardImageContainer {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    height: 200px;
+    perspective: 1000px;
+}
+
+.cardImage {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    filter: brightness(0.9) contrast(1.1);
 }
 
-.dentalCardButton{
-    width: fit-content;
-    color: #2E1588;
-    font-size: 1.2rem;
-    font-weight: bold;
-    justify-content: center;
-    align-items: center;
-    background-color: #ffffff;
-    padding: 5px 10px;
-    border-radius: 25px;
-    margin: auto;
-    margin-left: 30px;
+.dentalCard:hover .cardImage {
+    transform: scale(1.08) rotateX(5deg);
+    filter: brightness(1) contrast(1.2);
 }
 
-.dentalCardTitle{
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #0C4EF6;
+.imageOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg, 
+        rgba(0, 0, 0, 0.25) 0%, 
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(0, 0, 0, 0.15) 100%
+    );
+    transition: opacity 0.3s ease;
 }
 
+.dentalCard:hover .imageOverlay {
+    opacity: 0.7;
+}
 
-.dentalCardSubtitle{
+/* Enhanced Card Content Layout - Fixed Structure */
+.cardContent {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.cardHeader {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.cardInfo {
+    flex-grow: 1;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Enhanced Typography with Better Hierarchy */
+.cardTitle {
     font-size: 1.5rem;
-    font-weight: bold;
-    color: #2A63F3;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    text-shadow: 
+        1px 1px 2px rgba(0, 0, 0, 0.3),
+        0 0 10px rgba(255, 255, 255, 0.1);
+    letter-spacing: -0.025em;
+    line-height: 1.3;
 }
 
-.dentalCardTime{
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #0C4EF6;
-    margin-top: 10px;
-}
-
-.dentalCardFeatures{
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #0C4EF6;
-    margin-top: 10px;
-}
-
-ul{
-    list-style-type: none;
-    padding: 0;
-}
-
-.list {
-    color: #333;
-}
-
-.dentalCardDescription{
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #0C4EF6;
-    margin-top: 10px;
-}
-
-.dentalCardDescriptionText{
+.cardDescription {
     font-size: 1rem;
-    font-weight: normal;
-    color: #333;
-    margin-top: 5px;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+    opacity: 0.95;
+    font-weight: 400;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced Card Details with Glass Effect */
+.cardDetails {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Enhanced Detail Items with Icons */
+.detailItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.detailItem:hover {
+    background: rgba(255, 255, 255, 0.1);
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.detailIcon {
+    font-size: 1.2rem;
+    min-width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.detailText {
+    font-weight: 500;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced Card Actions - Fixed Visibility */
+.cardActions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: auto;
+    align-items: stretch;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+/* Premium Button Styling with Micro-interactions - Enhanced Visibility */
+.primaryButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.875rem 1.75rem;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    flex: 1;
+    min-height: 48px;
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.primaryButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        transparent
+    );
+    transition: left 0.5s ease;
+}
+
+.primaryButton:hover::before {
+    left: 100%;
+}
+
+.primaryButton:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.secondaryButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.875rem 1.75rem;
+    border-radius: 14px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    flex: 1;
+    min-height: 48px;
+    white-space: nowrap;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.secondaryButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced Button Interaction States */
+.buttonText {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.buttonIcon {
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.primaryButton:hover .buttonIcon {
+    transform: translateX(6px) scale(1.1);
+}
+
+.primaryButton:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.secondaryButton:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Enhanced Loading State */
+.loadingState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    grid-column: 1 / -1;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #6b7280;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    grid-column: 1 / -1;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+
+.loadingSpinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(6, 182, 212, 0.2);
+    border-top: 4px solid #06b6d4;
+    border-radius: 50%;
+    animation: spin 1.2s linear infinite;
+    margin-bottom: 1.5rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .dentalCardGrid {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .dentalServicesSection {
+        padding: 3rem 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dentalCardGrid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .dentalServicesSection {
+        padding: 2rem 1rem;
+    }
+    
+    .sectionTitle {
+        font-size: 2.5rem;
+    }
+    
+    .dentalCard {
+        padding: 1.25rem;
+    }
+    
+    .cardImageContainer {
+        height: 180px;
+    }
+    
+    .cardActions {
+        flex-direction: column;
+    }
+    
+    .primaryButton, .secondaryButton {
+        flex: none;
+    }
+    
+    .dentalPageText {
+        left: 2%;
+        font-size: clamp(1.2rem, 3vw, 2.5rem);
+    }
+    
+    .newNavBar {
+        transform: translate(20%, -1300%);
+    }
+}
+
+@media (max-width: 480px) {
+    .dentalServicesSection {
+        padding: 1.5rem 0.75rem;
+    }
+    
+    .dentalCard {
+        padding: 1rem;
+        border-radius: 16px;
+    }
+    
+    .cardImageContainer {
+        height: 160px;
+        border-radius: 12px;
+    }
+    
+    .cardTitle {
+        font-size: 1.3rem;
+    }
+    
+    .cardDescription {
+        font-size: 0.9rem;
+    }
+    
+    .primaryButton, .secondaryButton {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .detailItem {
+        font-size: 0.85rem;
+    }
+    
+    .dentalPageText {
+        left: 1rem;
+        font-size: clamp(1rem, 2.5vw, 2rem);
+    }
+    
+    .newNavBar {
+        transform: translate(10%, -1300%);
+    }
+}
+
+@media (max-width: 360px) {
+    .dentalCardGrid {
+        gap: 1rem;
+    }
+    
+    .dentalCard {
+        padding: 0.75rem;
+    }
+    
+    .cardImageContainer {
+        height: 140px;
+    }
+    
+    .cardTitle {
+        font-size: 1.2rem;
+    }
+    
+    .primaryButton, .secondaryButton {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Enhanced hover and focus states for accessibility */
+@media (hover: hover) {
+    .primaryButton:focus-visible, .secondaryButton:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.8);
+        outline-offset: 2px;
+    }
+    
+    .dentalCard:hover::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+        border-radius: 26px;
+        z-index: -1;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .dentalCard {
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .primaryButton, .secondaryButton {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .dentalCard,
+    .cardImage,
+    .primaryButton,
+    .secondaryButton,
+    .buttonIcon {
+        transition: none;
+    }
+    
+    .loadingSpinner {
+        animation: none;
+    }
+    
+    .dentalCard:hover {
+        transform: none;
+    }
 }

@@ -16,6 +16,6 @@ import Dashboard from './admin/Dashboard.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Dashboard/>
+    <App/>
   </StrictMode>
 )

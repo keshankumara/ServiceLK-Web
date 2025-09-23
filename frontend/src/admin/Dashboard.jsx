@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Dashboard.css'
+import NavBar from '../components/NavBar';
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('users');
@@ -142,7 +143,9 @@ React.useEffect(() => {
   const totalServices = services.length;
 
   return (
+    
     <div className="admin-container">
+      <NavBar/>
       <h1>Admin Dashboard</h1>
 
       {/* Summary Cards */}

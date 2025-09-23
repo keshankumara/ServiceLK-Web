@@ -10,179 +10,328 @@ import Img4 from '../assets/images/VehiclePage/img4.png'
 import Img5 from '../assets/images/VehiclePage/img5.png'
 import Img6 from '../assets/images/VehiclePage/img6.png'
 import NavBarNew from '../components/NavBarNew.jsx'
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+//const doctorImages = [Img2, Img3, Img4, Img5, Img6, Img7];
+
+function useVehicleServices() {
+    const [vehicleCategoryId, setVehicleCategoryId] = useState(null);
+    const [vehicleServices, setVehicleServices] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const categoryName = "Vehicle_service"; 
+
+    useEffect(() => {
+        async function fetchVehicleCategoryAndServices() {
+            try {
+                setLoading(true);
+                
+                // Fetch the doctor category
+                const categoryRes = await fetch(`http://localhost:8080/category/getAllCategories`);
+                const categoryData = await categoryRes.json();
+                console.log('Fetched Category Data:', categoryData);
+                
+                // Find the category with matching name
+                const matchedCategory = categoryData.find(cat => cat.name === categoryName);
+                
+                if (matchedCategory) {
+                    const vehicleCatId = matchedCategory.id;
+                    console.log('Vehicle Category ID:', vehicleCatId);
+                    setVehicleCategoryId(vehicleCatId);
+
+                    // Fetch all services
+                    const servicesRes = await fetch('http://localhost:8080/service/getAllServices');
+                    const servicesData = await servicesRes.json();
+                    console.log('All Services Data:', servicesData);
+                    console.log('Vehicle Category ID type:', typeof vehicleCatId, 'value:', vehicleCatId);
+
+                    // Filter services by vehicle category ID (ensure same type)
+                    const filteredServices = servicesData.filter(service => String(service.category_id) === String(vehicleCatId));
+                    console.log('Filtered Vehicle Services:', filteredServices);
+                    setVehicleServices(filteredServices);
+                } else {
+                    console.log('Vehicle category not found');
+                    setVehicleServices([]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch vehicle category or services:', error);
+                setVehicleCategoryId(null);
+                setVehicleServices([]);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchVehicleCategoryAndServices();
+    }, []);
+
+    return { vehicleCategoryId, vehicleServices, loading };
+}
 
 function VehiclePage() {
-  return (
-    <div className='vehiclePage'>
-        <NavBar/>
-        <div>
-            <img src={Img0} alt="Vehicle Page Banner" className='vehiclePageImage' />
-        </div>
-        <div className='newNavBar'>
-            <NavBarNew />
-        </div>
-        <div className="vehiclePageText ">
-            <h1>Keep Vehicle Running Smoothly...</h1>
-            <h1>Book Trusted Vehicle Services</h1>
-        </div>
-        <div className="vehiclePageSubText">
-            <h1 className="vehiclePage-header-details" id='service-topic'>Vehicle Services</h1>
-        </div>
+    const { vehicleServices, loading } = useVehicleServices();
+    const navigate = useNavigate();
+    
+    // State for popup management
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedService, setSelectedService] = useState(null);
+    const [bookingData, setBookingData] = useState({
+        bookingDate: '',
+        status: 'pending'
+    });
 
-        <div className='vehicleCard'>
-            <div className='vehicleCardLeft'>
-                <div>
-                    <img src={Img1} alt="Vehicle Card" className='vehicleCardImage'/>
-                </div>
-                <div>
-                    <button className='vehicleCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='vehicleCardRight'>
-                <h1 className='vehicleCardTitle'>QuickFix Auto Garage – Colombo</h1>
-                <h3 className='vehicleCardSubtitle'>Service: Full Vehicle Inspection</h3>
-                <h4 className='vehicleCardTime'>Time: Mon–Sat | 8:00 AM – 5:30 PM</h4>
-                <h3 className='vehicleCardFeatures'>Features:</h3>
-                <ul className='vehicleCardFeatureList'>
-                    <li className='list'>Engine diagnostics</li>
-                    <li className='list'>Brake and suspension check</li>
-                    <li className='list'>Fluid level inspection</li>
-                    <li className='list'>Battery health test</li>
-                </ul>
-                <h3 className='vehicleCardDescription'>Description:</h3>
-                <p className='vehicleCardDescriptionText'>Ensure your vehicle’s performance and safety with a thorough inspection by certified professionals.</p>
-            </div>
-        </div>
+    // Get user data from localStorage
+    const getUserData = () => {
+        try {
+            const userData = localStorage.getItem('userData');
+            return userData ? JSON.parse(userData) : null;
+        } catch (error) {
+            console.error('Error parsing user data:', error);
+            return null;
+        }
+    };
 
-        <div className='vehicleCard'>
-            <div className='vehicleCardLeft'>
-                <div>
-                    <img src={Img2} alt="Vehicle Card" className='vehicleCardImage'/>
-                </div>
-                <div>
-                    <button className='vehicleCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='vehicleCardRight'>
-                <h1 className='vehicleCardTitle'>BlueLine Car Wash – Colombo</h1>
-                <h3 className='vehicleCardSubtitle'>Service: Premium Car Wash & Polishing</h3>
-                <h4 className='vehicleCardTime'>Time: Mon–Sun | 9:00 AM – 6:30 PM</h4>
-                <h3 className='vehicleCardFeatures'>Features:</h3>
-                <ul className='vehicleCardFeatureList'>
-                    <li className='list'>Touchless pressure washing</li>
-                    <li className='list'>Interior deep vacuuming</li>
-                    <li className='list'>Dashboard and leather polishing</li>
-                    <li className='list'>Underbody rinse with rust protection</li>
-                </ul>
-                <h3 className='vehicleCardDescription'>Description:</h3>
-                <p className='vehicleCardDescriptionText'>Restore your car’s shine with our advanced blue-themed premium car wash and polish — spotless, scratch-free, and eco-conscious.</p>
-            </div>
-        </div>
+    // Handle appointment button click
+    const handleAppointmentClick = (service) => {
+        const userData = getUserData();
+        
+        if (!userData) {
+            alert('Please log in to book an appointment.');
+            window.location.href = '/login';
+            return;
+        }
 
-        <div className='vehicleCard'>
-            <div className='vehicleCardLeft'>
-                <div>
-                    <img src={Img3} alt="Vehicle Card" className='vehicleCardImage'/>
-                </div>
-                <div>
-                    <button className='vehicleCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='vehicleCardRight'>
-                <h1 className='vehicleCardTitle'> AutoCare Detailing Center – Gampaha</h1>
-                <h3 className='vehicleCardSubtitle'>Service: Complete Auto Detailing</h3>
-                <h4 className='vehicleCardTime'>Time: Mon–Sat | 8:30 AM – 5:00 PM</h4>
-                <h3 className='vehicleCardFeatures'>Features:</h3>
-                <ul className='vehicleCardFeatureList'>
-                    <li className='list'>Exterior waxing & buffing</li>
-                    <li className='list'>Engine bay cleaning</li>
-                    <li className='list'>Ceramic coating available</li>
-                    <li className='list'>Upholstery and seat shampooing</li>
-                </ul>
-                <h3 className='vehicleCardDescription'>Description:</h3>
-                <p className='vehicleCardDescriptionText'>Treat your car to the ultimate detailing session — top-to-bottom care with showroom-quality finishing and durable paint protection.</p>
-            </div>
-        </div>
+        setSelectedService(service);
+        setBookingData({
+            bookingDate: '',
+            status: 'pending'
+        });
+        setShowPopup(true);
+    };
 
-        <div className='vehicleCard'>
-            <div className='vehicleCardLeft'>
-                <div>
-                    <img src={Img4} alt="Vehicle Card" className='vehicleCardImage'/>
-                </div>
-                <div>
-                    <button className='vehicleCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='vehicleCardRight'>
-                <h1 className='vehicleCardTitle'>SmartWheels – Kandy</h1>
-                <h3 className='vehicleCardSubtitle'>Service: Mobile Car Services & Quick Repairs</h3>
-                <h4 className='vehicleCardTime'>Time: Mon–Fri | 9:00 AM – 4:00 PM</h4>
-                <h3 className='vehicleCardFeatures'>Features:</h3>
-                <ul className='vehicleCardFeatureList'>
-                    <li className='list'>On-demand oil change at your location</li>
-                    <li className='list'>Tyre pressure and battery check</li>
-                    <li className='list'>Mobile diagnostics</li>
-                    <li className='list'>Emergency roadside assistance</li>
-                </ul>
-                <h3 className='vehicleCardDescription'>Description:</h3>
-                <p className='vehicleCardDescriptionText'>Stay on the move with SmartWheels — smart, mobile vehicle servicing right at your doorstep or office.</p>
-            </div>
-        </div>
+    // Handle form submission
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        
+        const userData = getUserData();
+        
+        if (!userData) {
+            alert('User session expired. Please log in again.');
+            window.location.href = '/login';
+            return;
+        }
 
-        <div className='vehicleCard'>
-            <div className='vehicleCardLeft'>
-                <div>
-                    <img src={Img5} alt="Vehicle Card" className='vehicleCardImage'/>
-                </div>
-                <div>
-                    <button className='vehicleCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='vehicleCardRight'>
-                <h1 className='vehicleCardTitle'>MotoCare Service Hub – Nuwara Eliya</h1>
-                <h3 className='vehicleCardSubtitle'>Service: Motorcycle Service & Repair</h3>
-                <h4 className='vehicleCardTime'>Time: Mon–Fri | 8:00 AM – 4:30 PM</h4>
-                <h3 className='vehicleCardFeatures'>Features:</h3>
-                <ul className='vehicleCardFeatureList'>
-                    <li className='list'>Oil change & chain lubrication</li>
-                    <li className='list'>Brake pad replacement</li>
-                    <li className='list'>Electrical fault fixing</li>
-                    <li className='list'>Helmet sanitization</li>
-                </ul>
-                <h3 className='vehicleCardDescription'>Description:</h3>
-                <p className='vehicleCardDescriptionText'>Complete motorcycle maintenance from routine servicing to repairs by 2-wheeler experts.</p>
-            </div>
-        </div>
+        const bookingPayload = {
+            user_id: parseInt(userData.userId),
+            service_id: selectedService.id,
+            booking_date: bookingData.bookingDate,
+            status: bookingData.status
+        };
 
-        <div className='vehicleCard'>
-            <div className='vehicleCardLeft'>
-                <div>
-                    <img src={Img6} alt="Vehicle Card" className='vehicleCardImage'/>
-                </div>
-                <div>
-                    <button className='vehicleCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='vehicleCardRight'>
-                <h1 className='vehicleCardTitle'>DriveSafe Auto Care – Kurunegala</h1>
-                <h3 className='vehicleCardSubtitle'>Service: AC Repair & Maintenance</h3>
-                <h4 className='vehicleCardTime'>Time: Mon–Sat | 9:00 AM – 1:00 PM</h4>
-                <h3 className='vehicleCardFeatures'>Features:</h3>
-                <ul className='vehicleCardFeatureList'>
-                    <li className='list'>AC gas refill</li>
-                    <li className='list'>Cooling performance check</li>
-                    <li className='list'>Compressor testing</li>
-                    <li className='list'>Leak detection</li>
-                </ul>
-                <h3 className='vehicleCardDescription'>Description:</h3>
-                <p className='vehicleCardDescriptionText'>Beat the heat with fast and reliable car air conditioning repairs and servicing.</p>
-            </div>
-        </div>
+        try {
+            console.log('Booking vehicle service appointment with data:', bookingPayload);
+            
+            // Submit booking to backend
+            const response = await fetch('http://localhost:8080/booking/addBooking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookingPayload)
+            });
 
-        <Footer/>
-    </div>
-  )
+            if (response.ok) {
+                const result = await response.text();
+                console.log('Booking response:', result);
+                
+                //alert(`Vehicle service appointment booked successfully!\nUser: ${userData.username}\nService: ${selectedService.name}\nDate: ${bookingData.bookingDate}\nBooking ID: ${result || 'Generated'}`);
+                
+                // Close popup and reset form
+                setShowPopup(false);
+                setSelectedService(null);
+                setBookingData({
+                    bookingDate: '',
+                    status: 'pending'
+                });
+                
+                // Navigate to UserBookings page
+                navigate('/UserBookings');
+            } else {
+                const errorText = await response.text();
+                console.error('Booking failed:', errorText);
+                alert('Failed to book appointment. Please try again.');
+            }
+            
+        } catch (error) {
+            console.error('Error booking appointment:', error);
+            alert('Failed to book appointment. Please check your connection and try again.');
+        }
+    };
+
+    return (
+        <div className='vehiclePage'>
+            <NavBar/>
+            <div>
+                <img src={Img0} alt="Vehicle Page Banner" className='vehiclePageImage' />
+            </div>
+            <div className="vehiclePageText ">
+                <h1 className='vehicle'>Keep Vehicle Running Smoothly...</h1>
+                <h1 className='vehicle'>Book Trusted Vehicle Services</h1>
+            </div>
+            <div className='vehicleServicesSection'>
+                <div className='sectionHeader'>
+                    <h2 className='sectionTitle'>Professional Vehicle Services</h2>
+                    <p className='sectionSubtitle'>Expert automotive care to keep your vehicle in perfect condition</p>
+                </div>
+                
+                <div className='vehicleCardGrid'>
+                    {loading ? (
+                        <div className='loadingState'>
+                            <div className='loadingSpinner'></div>
+                            <p>Loading vehicle services...</p>
+                        </div>
+                    ) : vehicleServices.length === 0 ? (
+                        <div className='emptyState'>
+                            <p>No vehicle services found at the moment.</p>
+                        </div>
+                    ) : (
+                        vehicleServices.map((service, idx) => {
+                            // Cycle through images for each card
+                            const images = [Img1, Img2, Img3, Img4, Img5, Img6];
+                            const imageSrc = images[idx % images.length];
+                            
+                            // Define unique automotive-themed gradient combinations for each card
+                            const gradientClasses = [
+                                'gradient-racing-red',
+                                'gradient-midnight-blue', 
+                                'gradient-carbon-gray',
+                                'gradient-electric-green',
+                                'gradient-chrome-silver',
+                                'gradient-sunset-orange'
+                            ];
+                            const gradientClass = gradientClasses[idx % gradientClasses.length];
+                            
+                            return (
+                                <article key={service.id} className={`vehicleCard ${gradientClass}`}>
+                                    <div className='cardHeader'>
+                                        <div className='cardImageContainer'>
+                                            <img src={imageSrc} alt={`${service.name} vehicle service`} className='cardImage'/>
+                                            <div className='imageOverlay'></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className='cardContent'>
+                                        <div className='cardInfo'>
+                                            <h3 className='cardTitle'>{service.name}</h3>
+                                            <p className='cardDescription'>{service.description}</p>
+                                            
+                                            <div className='cardDetails'>
+                                                <div className='detailItem'>
+                                                    <span className='detailIcon'>📍</span>
+                                                    <span className='detailText'>{service.location}</span>
+                                                </div>
+                                                <div className='detailItem'>
+                                                    <span className='detailIcon'>💰</span>
+                                                    <span className='detailText'>LKR {service.price}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className='cardActions'>
+                                            <button 
+                                                className='primaryButton'
+                                                onClick={() => handleAppointmentClick(service)}
+                                            >
+                                                <span className='buttonText'>Appointment</span>
+                                                <span className='buttonIcon'>→</span>
+                                            </button>
+                                            <button className='secondaryButton'>Get Quote</button>
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+            
+            {/* Appointment Booking Popup */}
+            {showPopup && (
+                <div className='popupOverlay' onClick={() => setShowPopup(false)}>
+                    <div className='popupContent' onClick={(e) => e.stopPropagation()}>
+                        <div className='popupHeader'>
+                            <h3 className='popupTitle'>Book Vehicle Service Appointment</h3>
+                            <button 
+                                className='closeButton'
+                                onClick={() => setShowPopup(false)}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        
+                        {selectedService && (
+                            <div className='popupBody'>
+                                <div className='serviceDetails'>
+                                    <h4>Service Details</h4>
+                                    <p><strong>Service:</strong> {selectedService.name}</p>
+                                    <p><strong>Description:</strong> {selectedService.description}</p>
+                                    <p><strong>Location:</strong> {selectedService.location}</p>
+                                    <p><strong>Price:</strong> LKR {selectedService.price}</p>
+                                </div>
+
+                                <div className='userDetails'>
+                                    <h4>User Information</h4>
+                                    <p><strong>User:</strong> {getUserData()?.username || 'Not logged in'}</p>
+                                    <p><strong>User ID:</strong> {getUserData()?.userId || 'Not logged in'}</p>
+                                </div>
+                                
+                                <form className='bookingForm' onSubmit={handleFormSubmit}>
+                                    <div className='formGroup'>
+                                        <label htmlFor='bookingDate'>Service Date:</label>
+                                        <input
+                                            type='date'
+                                            id='bookingDate'
+                                            value={bookingData.bookingDate}
+                                            onChange={(e) => setBookingData({...bookingData, bookingDate: e.target.value})}
+                                            min={new Date().toISOString().split('T')[0]}
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div className='formGroup'>
+                                        <label htmlFor='status'>Status:</label>
+                                        <select
+                                            id='status'
+                                            value={bookingData.status}
+                                            onChange={(e) => setBookingData({...bookingData, status: e.target.value})}
+                                        >
+                                            
+                                            <option value='confirmed'>Confirmed</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div className='popupActions'>
+                                        <button type='submit' className='submitButton'>
+                                            Book Service
+                                        </button>
+                                        <button 
+                                            type='button' 
+                                            className='cancelButton'
+                                            onClick={() => setShowPopup(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+            
+            <Footer/>
+        </div>
+    )
 }
 
 export default VehiclePage

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './navBar.css';
 
 function NavBar() {
@@ -22,6 +23,7 @@ function NavBar() {
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn'); // clear login flag
+    localStorage.removeItem('userData'); // clear user data
     setIsLoggedIn(false);
     window.location.href = '/'; // redirect to home
   };
@@ -42,6 +44,33 @@ function NavBar() {
               Services
             </a>
           </li>
+
+          {/* Show service links only when logged in */}
+          {isLoggedIn && (
+            <>
+              <li className='navBarItem'>
+                <Link to="/DoctorPage" className='navBarLink'>Doctors & Clinics</Link>
+              </li>
+              <li className='navBarItem'>
+                <Link to="/SalonPage" className='navBarLink'>Beauty & Salon</Link>
+              </li>
+              <li className='navBarItem'>
+                <Link to="/WellnessPage" className='navBarLink'>Therapy & Wellness</Link>
+              </li>
+              <li className='navBarItem'>
+                <Link to="/ConsultationsPage" className='navBarLink'>Consultations</Link>
+              </li>
+              <li className='navBarItem'>
+                <Link to="/DentalPage" className='navBarLink'>Dental Services</Link>
+              </li>
+              <li className='navBarItem'>
+                <Link to="/VehiclePage" className='navBarLink'>Vehicle Services</Link>
+              </li>
+              <li className='navBarItem'>
+                <Link to="/UserBookings" className='navBarLink'>My Bookings</Link>
+              </li>
+            </>
+          )}
 
           {/* Show Login if not logged in, Logout if logged in */}
           <li className='navBarItem'>

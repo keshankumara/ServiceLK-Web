@@ -9,180 +9,330 @@ import Img4 from '../assets/images/DoctorPage/img4.png'
 import Img5 from '../assets/images/DoctorPage/img5.png'
 import Img6 from '../assets/images/DoctorPage/img6.png'
 import Img7 from '../assets/images/DoctorPage/img7.png'
-import NavBarNew from '../components/NavBarNew.jsx'
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+//const doctorImages = [Img2, Img3, Img4, Img5, Img6, Img7];
+
+function useDoctorServices() {
+    const [doctorCategoryId, setDoctorCategoryId] = useState(null);
+    const [doctorServices, setDoctorServices] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const categoryName = "Doctor_clinics"; 
+
+    useEffect(() => {
+        async function fetchDoctorCategoryAndServices() {
+            try {
+                setLoading(true);
+                
+                // Fetch the doctor category
+                const categoryRes = await fetch(`http://localhost:8080/category/getAllCategories`);
+                const categoryData = await categoryRes.json();
+                console.log('Fetched Category Data:', categoryData);
+                
+                // Find the category with matching name
+                const matchedCategory = categoryData.find(cat => cat.name === categoryName);
+                
+                if (matchedCategory) {
+                    const doctorCatId = matchedCategory.id;
+                    console.log('Doctor Category ID:', doctorCatId);
+                    setDoctorCategoryId(doctorCatId);
+
+                    // Fetch all services
+                    const servicesRes = await fetch('http://localhost:8080/service/getAllServices');
+                    const servicesData = await servicesRes.json();
+                    console.log('All Services Data:', servicesData);
+                    console.log('Doctor Category ID type:', typeof doctorCatId, 'value:', doctorCatId);
+                    
+                    
+                    // Filter services by doctor category ID (ensure same type)
+                    const filteredServices = servicesData.filter(service => String(service.category_id) === String(doctorCatId));
+                    console.log('Filtered Doctor Services:', filteredServices);
+                    setDoctorServices(filteredServices);
+                } else {
+                    console.log('Doctor category not found');
+                    setDoctorServices([]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch doctor category or services:', error);
+                setDoctorCategoryId(null);
+                setDoctorServices([]);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchDoctorCategoryAndServices();
+    }, []);
+
+    return { doctorCategoryId, doctorServices, loading };
+}
 
 function DoctorPage() {
-  return (
-    <div className='doctorPage'>
-        <NavBar/>
-        <div>
-            <img src={Img1} alt="Doctor Page Banner" className='doctorPageImage' />
-        </div>
-        <div className='newNavBar'>
-            <NavBarNew />
-        </div>
-        <div className="doctorPageText ">
-            <h1>Your Health, Our Priority...</h1>
-            <h1>Find Trusted Doctors &</h1>
-            <h1>Clinics</h1>
-        </div>
-        <div className="doctorPageSubText">
-            <h1 className="doctorPage-header-details" id='service-topic'>Doctors & Clinics</h1>
-        </div>
+    const { doctorServices, loading } = useDoctorServices();
+    const navigate = useNavigate();
+    
+    // State for popup management
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedService, setSelectedService] = useState(null);
+    const [bookingData, setBookingData] = useState({
+        bookingDate: '',
+        status: 'pending'
+    });
 
-        <div className='doctorCard'>
-            <div className='doctorCardLeft'>
-                <div>
-                    <img src={Img2} alt="Doctor Card" className='doctorCardImage'/>
-                </div>
-                <div>
-                    <button className='doctorCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='doctorCardRight'>
-                <h1 className='doctorCardTitle'>City Health Clinic – Colombo</h1>
-                <h3 className='doctorCardSubtitle'>Specialist: General Physician</h3>
-                <h4 className='doctorCardTime'>Time: Mon–Sat | 9:00 AM – 12:00 PM</h4>
-                <h3 className='doctorCardFeatures'>Features:</h3>
-                <ul className='doctorCardFeatureList'>
-                    <li className='list'>General illness treatment</li>
-                    <li className='list'>Blood pressure and diabetes checkups</li>
-                    <li className='list'>Online prescription service</li>
-                    <li className='list'>Follow-up reminders</li>
-                </ul>
-                <h3 className='doctorCardDescription'>Description:</h3>
-                <p className='doctorCardDescriptionText'>A top-rated family clinic offering friendly and quick medical care for all ages.</p>
-            </div>
-        </div>
+    // Get user data from localStorage
+    const getUserData = () => {
+        try {
+            const userData = localStorage.getItem('userData');
+            return userData ? JSON.parse(userData) : null;
+        } catch (error) {
+            console.error('Error parsing user data:', error);
+            return null;
+        }
+    };
 
-        <div className='doctorCard'>
-            <div className='doctorCardLeft'>
-                <div>
-                    <img src={Img3} alt="Doctor Card" className='doctorCardImage'/>
-                </div>
-                <div>
-                    <button className='doctorCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='doctorCardRight'>
-                <h1 className='doctorCardTitle'>Sunshine Pediatric Care – Kandy</h1>
-                <h3 className='doctorCardSubtitle'>Specialist: Pediatrician</h3>
-                <h4 className='doctorCardTime'>Time: Mon–Fri | 10:00 AM – 1:00 PM</h4>
-                <h3 className='doctorCardFeatures'>Features:</h3>
-                <ul className='doctorCardFeatureList'>
-                    <li className='list'>Child growth tracking</li>
-                    <li className='list'>Immunization scheduling</li>
-                    <li className='list'>Allergy testing</li>
-                    <li className='list'>Online video consultations</li>
-                </ul>
-                <h3 className='doctorCardDescription'>Description:</h3>
-                <p className='doctorCardDescriptionText'>Focused child care with experienced pediatricians and play-friendly clinic spaces.</p>
-            </div>
-        </div>
+    // Handle appointment button click
+    const handleAppointmentClick = (service) => {
+        const userData = getUserData();
+        
+        if (!userData) {
+            alert('Please log in to book an appointment.');
+            window.location.href = '/login';
+            return;
+        }
 
-        <div className='doctorCard'>
-            <div className='doctorCardLeft'>
-                <div>
-                    <img src={Img4} alt="Doctor Card" className='doctorCardImage'/>
-                </div>
-                <div>
-                    <button className='doctorCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='doctorCardRight'>
-                <h1 className='doctorCardTitle'>Elite Medical Center – Galle</h1>
-                <h3 className='doctorCardSubtitle'>Specialist: ENT Specialist</h3>
-                <h4 className='doctorCardTime'>Time: Tue–Sun | 2:00 PM – 5:00 PM</h4>
-                <h3 className='doctorCardFeatures'>Features:</h3>
-                <ul className='doctorCardFeatureList'>
-                    <li className='list'>Hearing tests</li>
-                    <li className='list'>Nasal endoscopy</li>
-                    <li className='list'>Ear wax removal</li>
-                    <li className='list'>Allergy control treatments</li>
-                </ul>
-                <h3 className='doctorCardDescription'>Description:</h3>
-                <p className='doctorCardDescriptionText'>Specialized ENT care for sinus, allergy, and ear balance issues.</p>
-            </div>
-        </div>
+        setSelectedService(service);
+        setBookingData({
+            bookingDate: '',
+            status: 'pending'
+        });
+        setShowPopup(true);
+    };
 
-        <div className='doctorCard'>
-            <div className='doctorCardLeft'>
-                <div>
-                    <img src={Img5} alt="Doctor Card" className='doctorCardImage'/>
-                </div>
-                <div>
-                    <button className='doctorCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='doctorCardRight'>
-                <h1 className='doctorCardTitle'>HeartCare Hospital – Colombo</h1>
-                <h3 className='doctorCardSubtitle'>Specialist: Cardiologist</h3>
-                <h4 className='doctorCardTime'>Time: Mon–Fri | 4:00 PM – 6:30 PM</h4>
-                <h3 className='doctorCardFeatures'>Features:</h3>
-                <ul className='doctorCardFeatureList'>
-                    <li className='list'>ECG and echo testing</li>
-                    <li className='list'>Cholesterol and heart health plan</li>
-                    <li className='list'>Medication management</li>
-                    <li className='list'>Lifestyle consultation</li>
-                </ul>
-                <h3 className='doctorCardDescription'>Description:</h3>
-                <p className='doctorCardDescriptionText'>Book a heart expert for early detection and long-term cardiac wellness.</p>
-            </div>
-        </div>
+    // Handle form submission
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        
+        const userData = getUserData();
+        
+        if (!userData) {
+            alert('User session expired. Please log in again.');
+            window.location.href = '/login';
+            return;
+        }
 
-        <div className='doctorCard'>
-            <div className='doctorCardLeft'>
-                <div>
-                    <img src={Img6} alt="Doctor Card" className='doctorCardImage'/>
-                </div>
-                <div>
-                    <button className='doctorCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='doctorCardRight'>
-                <h1 className='doctorCardTitle'>Hope Family Clinic – Negombo</h1>
-                <h3 className='doctorCardSubtitle'>Specialist: Family Medicine</h3>
-                <h4 className='doctorCardTime'>Time: Daily | 8:00 AM – 11:00 AM</h4>
-                <h3 className='doctorCardFeatures'>Features:</h3>
-                <ul className='doctorCardFeatureList'>
-                    <li className='list'>Family check-ups</li>
-                    <li className='list'>Women's health monitoringn</li>
-                    <li className='list'>Diet & weight consultations</li>
-                    <li className='list'>Free blood pressure monitoring</li>
-                </ul>
-                <h3 className='doctorCardDescription'>Description:</h3>
-                <p className='doctorCardDescriptionText'>A trusted family-friendly clinic with experienced GPs and supportive staff.</p>
-            </div>
-        </div>
+        const bookingPayload = {
+            user_id: parseInt(userData.userId),
+            service_id: selectedService.id,
+            booking_date: bookingData.bookingDate,
+            status: bookingData.status
+        };
 
-        <div className='doctorCard'>
-            <div className='doctorCardLeft'>
-                <div>
-                    <img src={Img7} alt="Doctor Card" className='doctorCardImage'/>
-                </div>
-                <div>
-                    <button className='doctorCardButton'>Schedule Now</button>
-                </div>
-            </div>
-            <div className='doctorCardRight'>
-                <h1 className='doctorCardTitle'>WellLife Centre – Nuwara Eliya</h1>
-                <h3 className='doctorCardSubtitle'>Specialist: Dermatologist</h3>
-                <h4 className='doctorCardTime'>Time: Mon–Sat | 3:00 PM – 6:00 PM</h4>
-                <h3 className='doctorCardFeatures'>Features:</h3>
-                <ul className='doctorCardFeatureList'>
-                    <li className='list'>Acne treatment</li>
-                    <li className='list'>Hair loss analysis</li>
-                    <li className='list'>Skin rash diagnosis</li>
-                    <li className='list'>Laser therapy</li>
-                </ul>
-                <h3 className='doctorCardDescription'>Description:</h3>
-                <p className='doctorCardDescriptionText'>Personal skincare with evidence-based solutions and cosmetic dermatology.</p>
-            </div>
-        </div>
+        try {
+            console.log('Booking appointment with data:', bookingPayload);
+            
+            // Submit booking to backend
+            const response = await fetch('http://localhost:8080/booking/addBooking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bookingPayload)
+            });
 
-        <Footer/>
-    </div>
-  )
+            if (response.ok) {
+                const result = await response.text();
+                console.log('Booking response:', result);
+                
+                //alert(`Medical appointment booked successfully!\nUser: ${userData.username}\nService: ${selectedService.name}\nDate: ${bookingData.bookingDate}\nBooking ID: ${result || 'Generated'}`);
+                
+                // Close popup and reset form
+                setShowPopup(false);
+                setSelectedService(null);
+                setBookingData({
+                    bookingDate: '',
+                    status: 'pending'
+                });
+                
+                // Navigate to UserBookings page
+                navigate('/UserBookings');
+            } else {
+                const errorText = await response.text();
+                console.error('Booking failed:', errorText);
+                alert('Failed to book appointment. Please try again.');
+            }
+            
+        } catch (error) {
+            console.error('Error booking appointment:', error);
+            alert('Failed to book appointment. Please check your connection and try again.');
+        }
+    };
+
+    return (
+        <div className='doctorPage'>
+            <NavBar/>
+            <div>
+                <img src={Img1} alt="Doctor Page Banner" className='doctorPageImage' />
+            </div>
+            <div className="doctorPageText ">
+                <h1 className='doctorPageTitle' >Your Health, Our Priority...</h1>
+                <h1 className='doctorPageTitle'>Find Trusted Doctors &</h1>
+                <h1 className='doctorPageTitle'>Clinics</h1>
+            </div>
+            <div className='doctorServicesSection'>
+                <div className='sectionHeader'>
+                    <h2 className='sectionTitle' style={{ color: "black" }}>Available Medical Services</h2>
+                    <p className='sectionSubtitle'>Discover trusted healthcare providers in your area</p>
+                </div>
+                
+                <div className='doctorCardGrid'>
+                    {loading ? (
+                        <div className='loadingState'>
+                            <div className='loadingSpinner'></div>
+                            <p>Loading medical services...</p>
+                        </div>
+                    ) : doctorServices.length === 0 ? (
+                        <div className='emptyState'>
+                            <p>No medical services found at the moment.</p>
+                        </div>
+                    ) : (
+                        doctorServices.map((service, idx) => {
+                            // Cycle through images for each card
+                            const images = [Img2, Img3, Img4, Img5, Img6, Img7];
+                            const imageSrc = images[idx % images.length];
+                            
+                            // Define unique gradient combinations for each card
+                            const gradientClasses = [
+                                'gradient-ocean-blue',
+                                'gradient-sunset-orange', 
+                                'gradient-emerald-green',
+                                'gradient-royal-purple',
+                                'gradient-rose-pink',
+                                'gradient-cosmic-blue'
+                            ];
+                            const gradientClass = gradientClasses[idx % gradientClasses.length];
+                            
+                            return (
+                                <article key={service.id} className={`doctorCard ${gradientClass}`}>
+                                    <div className='cardHeader'>
+                                        <div className='cardImageContainer'>
+                                            <img src={imageSrc} alt={`${service.name} medical service`} className='cardImage'/>
+                                            <div className='imageOverlay'></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className='cardContent'>
+                                        <div className='cardInfo'>
+                                            <h3 className='cardTitle' style={{ color: "black" }}>{service.name}</h3>
+                                            <p className='cardDescription' style={{ color: "black" }}>{service.description}</p>
+                                            
+                                            <div className='cardDetails'>
+                                                <div className='detailItem'>
+                                                    <span className='detailIcon'>📍</span>
+                                                    <span className='detailText' style={{ color: "black" }}>{service.location}</span>
+                                                </div>
+                                                <div className='detailItem'>
+                                                    <span className='detailIcon'>💰</span>
+                                                    <span className='detailText' style={{ color: "black" }}>LKR {service.price}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className='cardActions'>
+                                            <button 
+                                                className='primaryButton'
+                                                onClick={() => handleAppointmentClick(service)}
+                                            >
+                                                <span className='buttonText' style={{ color: "black" }}>Appointment</span>
+                                                <span className='buttonIcon'>→</span>
+                                            </button>
+                                            <button className='secondaryButton' style={{ color: "black" }}>Learn More</button>
+                                        </div>
+                                    </div>
+                                </article>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+            
+            {/* Appointment Booking Popup */}
+            {showPopup && (
+                <div className='popupOverlay' onClick={() => setShowPopup(false)}>
+                    <div className='popupContent' onClick={(e) => e.stopPropagation()}>
+                        <div className='popupHeader'>
+                            <h3 className='popupTitle'>Book Appointment</h3>
+                            <button 
+                                className='closeButton'
+                                onClick={() => setShowPopup(false)}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        
+                        {selectedService && (
+                            <div className='popupBody'>
+                                <div className='serviceDetails'>
+                                    <h4>Service Details</h4>
+                                    <p><strong>Service:</strong> {selectedService.name}</p>
+                                    <p><strong>Description:</strong> {selectedService.description}</p>
+                                    <p><strong>Location:</strong> {selectedService.location}</p>
+                                    <p><strong>Price:</strong> LKR {selectedService.price}</p>
+                                </div>
+
+                                <div className='userDetails'>
+                                    <h4>User Information</h4>
+                                    <p><strong>User:</strong> {getUserData()?.username || 'Not logged in'}</p>
+                                    <p><strong>User ID:</strong> {getUserData()?.userId || 'Not logged in'}</p>
+                                </div>
+                                
+                                <form className='bookingForm' onSubmit={handleFormSubmit}>
+                                    <div className='formGroup'>
+                                        <label htmlFor='bookingDate'>Booking Date:</label>
+                                        <input
+                                            type='date'
+                                            id='bookingDate'
+                                            value={bookingData.bookingDate}
+                                            onChange={(e) => setBookingData({...bookingData, bookingDate: e.target.value})}
+                                            min={new Date().toISOString().split('T')[0]}
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div className='formGroup'>
+                                        <label htmlFor='status'>Status:</label>
+                                        <select
+                                            id='status'
+                                            value={bookingData.status}
+                                            onChange={(e) => setBookingData({...bookingData, status: e.target.value})}
+                                        >
+                                            
+                                            <option value='confirmed'>Confirmed</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div className='popupActions'>
+                                        <button type='submit' className='submitButton'>
+                                            Book Appointment
+                                        </button>
+                                        <button 
+                                            type='button' 
+                                            className='cancelButton'
+                                            onClick={() => setShowPopup(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+            
+            <Footer/>
+        </div>
+    )
 }
 
 export default DoctorPage
